@@ -1,0 +1,61 @@
+namespace: streaming-app
+
+images:
+  auth:
+    repository: gaurydocker/streaming-auth
+    tag: "1.0.0"
+
+  streaming:
+    repository: gaurydocker/streaming-stream
+    tag: "1.0.0"
+
+  admin:
+    repository: gaurydocker/streaming-admin
+    tag: "1.0.0"
+
+  chat:
+    repository: gaurydocker/streaming-chat
+    tag: "1.0.0"
+
+  frontend:
+    repository: gaurydocker/streaming-frontend
+    tag: "1.0.0"
+
+  mongo:
+    repository: mongo
+    tag: "6"
+
+replicaCount:
+  auth: 1
+  streaming: 1
+  admin: 1
+  chat: 1
+  frontend: 1
+  mongo: 1
+
+config:
+  authPort: "3001"
+  streamingPort: "3002"
+  adminPort: "3003"
+  chatPort: "3004"
+
+  clientUrls: "http://streamingapp.local:62991"
+  streamingPublicUrl: "http://streamingapp.local"
+
+  awsRegion: "us-east-1"
+  awsS3Bucket: "streamingapp-gaury-2026"
+
+  mongoDb: "streamingapp"
+  mongoHost: "mongo"
+  mongoPort: "27017"
+  mongoUri: "mongodb://mongo:27017/streamingapp"
+
+secret:
+  jwtSecret: "CHANGE_ME_JWT_SECRET"
+  awsAccessKeyId: "CHANGE_ME_AWS_ACCESS_KEY_ID"
+  awsSecretAccessKey: "CHANGE_ME_AWS_SECRET_ACCESS_KEY"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: streamingapp.local

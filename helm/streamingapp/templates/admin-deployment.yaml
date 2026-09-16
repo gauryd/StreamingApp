@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount.admin }}
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+
+  selector:
+    matchLabels:
+      app: admin
+
+  template:
+    metadata:
+      labels:
+        app: admin
+
+    spec:
+      containers:
+        - name: admin
+          image: "{{ .Values.images.admin.repository }}:{{ .Values.images.admin.tag }}"
+
+          ports:
+            - containerPort: 3003
+
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3003
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3003
+            initialDelaySeconds: 20
+            periodSeconds: 20
+
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: ADMIN_PORT
+
+            - name: MONGO_URI
+              value: {{ .Values.config.mongoUri | quote }}
+
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: streaming-secret
+                  key: JWT_SECRET
+
+            - name: CLIENT_URLS
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: CLIENT_URLS
+
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: streaming-secret
+                  key: AWS_ACCESS_KEY_ID
+
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: streaming-secret
+                  key: AWS_SECRET_ACCESS_KEY
+
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: AWS_REGION
+
+            - name: AWS_S3_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: AWS_S3_BUCKET

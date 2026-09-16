@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: streaming
+  namespace: streaming-app
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: streaming
+
+  template:
+    metadata:
+      labels:
+        app: streaming
+
+    spec:
+      containers:
+        - name: streaming
+          image: gaurydocker/streaming-stream:1.0.0
+
+          ports:
+            - containerPort: 3002
+
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: STREAMING_PORT
+
+            - name: MONGO_URI
+              value: "mongodb://mongo:27017/streamingapp"
+
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: streaming-secret
+                  key: JWT_SECRET
+
+            - name: CLIENT_URLS
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: CLIENT_URLS
+
+            - name: STREAMING_PUBLIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: STREAMING_PUBLIC_URL
+
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: streaming-secret
+                  key: AWS_ACCESS_KEY_ID
+
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: streaming-secret
+                  key: AWS_SECRET_ACCESS_KEY
+
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: streaming-config
+                  key: AWS_REGION
